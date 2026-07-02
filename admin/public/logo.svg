@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="white">
+  <!-- Mảnh phim bên trái -->
+  <path d="M10,40 L45,55 L45,95 L10,80 Z" fill="#ffffff" />
+  <rect x="15" y="48" width="6" height="6" fill="#0B0E14" transform="rotate(23, 18, 51)" />
+  <rect x="25" y="52" width="6" height="6" fill="#0B0E14" transform="rotate(23, 28, 55)" />
+  <rect x="35" y="56" width="6" height="6" fill="#0B0E14" transform="rotate(23, 38, 59)" />
+  
+  <rect x="15" y="70" width="6" height="6" fill="#0B0E14" transform="rotate(23, 18, 73)" />
+  <rect x="25" y="74" width="6" height="6" fill="#0B0E14" transform="rotate(23, 28, 77)" />
+  <rect x="35" y="78" width="6" height="6" fill="#0B0E14" transform="rotate(23, 38, 81)" />
+
+  <!-- Mảnh phim bên phải -->
+  <path d="M90,40 L55,55 L55,95 L90,80 Z" fill="#ffffff" />
+  <rect x="60" y="56" width="6" height="6" fill="#0B0E14" transform="rotate(-23, 63, 59)" />
+  <rect x="70" y="52" width="6" height="6" fill="#0B0E14" transform="rotate(-23, 73, 55)" />
+  <rect x="80" y="48" width="6" height="6" fill="#0B0E14" transform="rotate(-23, 83, 51)" />
+
+  <rect x="60" y="78" width="6" height="6" fill="#0B0E14" transform="rotate(-23, 63, 81)" />
+  <rect x="70" y="74" width="6" height="6" fill="#0B0E14" transform="rotate(-23, 73, 77)" />
+  <rect x="80" y="70" width="6" height="6" fill="#0B0E14" transform="rotate(-23, 83, 73)" />
+
+  <!-- Lá sách (Book pages) trên -->
+  <path d="M45,52 Q25,35 15,35 Q25,40 45,55 Z" fill="#ffffff" />
+  <path d="M48,45 Q30,25 20,25 Q30,30 48,48 Z" fill="#ffffff" />
+
+  <path d="M55,52 Q75,35 85,35 Q75,40 55,55 Z" fill="#ffffff" />
+  <path d="M52,45 Q70,25 80,25 Q70,30 52,48 Z" fill="#ffffff" />
+</svg>

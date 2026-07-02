@@ -1,0 +1,160 @@
+.user-profile-page {
+  padding-bottom: 50px;
+}
+
+.profile-layout {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+/* Sidebar Styling */
+.profile-sidebar {
+  width: 250px;
+  background-color: transparent;
+}
+
+.profile-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: 1px solid #ccc;
+}
+
+.profile-sidebar li {
+  padding: 15px;
+  border-bottom: 1px solid #ccc;
+  font-size: 16px;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: white;
+}
+
+.profile-sidebar li:hover {
+  background-color: #f5f5f5;
+}
+
+.profile-sidebar li.active {
+  background-color: #E71A0F;
+  color: white;
+  font-weight: bold;
+}
+
+/* Main Content Styling */
+.profile-main-content {
+  flex: 1;
+}
+
+.content-box {
+  background: white;
+  border: 1px solid #e0e0e0;
+  padding: 30px;
+}
+
+.content-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: #222;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 15px;
+  margin-top: 0;
+  margin-bottom: 25px;
+}
+
+/* Form Styling */
+.profile-form {
+  max-width: 500px;
+}
+
+.profile-form .form-group {
+  margin-bottom: 20px;
+}
+
+.profile-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.profile-form input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+  background-color: #fff;
+}
+
+.profile-form input:focus {
+  border-color: #E71A0F;
+}
+
+.profile-form input.disabled-input {
+  background-color: #eee;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.profile-form .hint {
+  display: block;
+  font-size: 12px;
+  color: #888;
+  margin-top: 5px;
+}
+
+.form-actions {
+  margin-top: 30px;
+}
+
+.save-btn {
+  padding: 12px 30px;
+  background: #E71A0F;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.2s;
+}
+
+.save-btn:hover {
+  background: #c2150a;
+}
+
+/* Alerts */
+.alert-message {
+  padding: 12px 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.alert-message.error {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+.alert-message.success {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.loading-spinner {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-style: italic;
+}

@@ -1,0 +1,246 @@
+.movies-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 25px;
+  border-radius: 25px;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.filter-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.glass-select {
+  background: var(--bg-surface-hover);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+}
+
+.glass-select option {
+  background: var(--bg-surface);
+}
+
+.filter-stats {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.count-badge {
+  color: var(--accent-secondary);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.view-toggles {
+  display: flex;
+  background: var(--bg-surface-hover);
+  border-radius: 20px;
+  padding: 4px;
+}
+
+.toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 6px 12px;
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.toggle-btn.active {
+  background: var(--accent-gradient);
+  color: white;
+}
+
+/* Grid Layout */
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.movie-card {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  border: 1px solid var(--bg-surface-hover);
+}
+
+.card-image-container {
+  position: relative;
+  width: 100%;
+  padding-top: 150%; /* 2:3 aspect ratio */
+  overflow: hidden;
+}
+
+.card-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.movie-card:hover .card-image {
+  transform: scale(1.05);
+}
+
+.card-badges {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 10;
+}
+
+.left-badges {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.quality-badge {
+  background: var(--accent-primary);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  letter-spacing: 0.5px;
+}
+
+.quality-badge.new {
+  background: #10B981; /* Emerald 500 */
+}
+
+.age-badge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 4px 6px;
+  border-radius: 6px;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+}
+
+.age-18 { background: #E11D48; } /* Red */
+.age-16 { background: #F59E0B; } /* Orange */
+.age-13 { background: #D97706; } /* Dark Orange */
+.age-p { background: #3B82F6; }  /* Blue for Everyone */
+.age-default { background: #6B7280; } /* Gray */
+
+.rating-badge {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-actions-inline {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid var(--bg-surface-hover);
+}
+
+.action-btn-small {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 0;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+}
+
+.action-btn-small.edit {
+  background: rgba(6, 182, 212, 0.15);
+  color: #06B6D4;
+}
+
+.action-btn-small.edit:hover {
+  background: rgba(6, 182, 212, 0.3);
+}
+
+.action-btn-small.delete {
+  background: rgba(239, 68, 68, 0.15);
+  color: #EF4444;
+}
+
+.action-btn-small.delete:hover {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+.card-info {
+  padding: 15px;
+}
+
+.movie-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.movie-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.genre-tag {
+  background: var(--border-color);
+  padding: 2px 8px;
+  border-radius: 10px;
+}

@@ -1,0 +1,210 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Save, X, Coffee } from 'lucide-react';
+import foodDrinkApi from '../api/foodDrinkApi';
+
+const FoodDrinkForm = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const isEdit = Boolean(id);
+  
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    price: '',
+    imageUrl: ''
+  });
+
+  useEffect(() => {
+    if (isEdit) {
+      fetchItem();
+    }
+  }, [id]);
+
+  const fetchItem = async () => {
+    try {
+      setLoading(true);
+      const data = await foodDrinkApi.getById(id);
+      if (data) {
+        setFormData({
+          name: data.name || '',
+          description: data.description || '',
+          price: data.price || '',
+          imageUrl: data.imageUrl || ''
+        });
+      }
+    } catch (error) {
+      console.error("Lỗi khi tải thông tin combo:", error);
+      alert("Không tìm thấy combo bắp nước!");
+      navigate('/food-drinks');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const payload = {
+        ...formData,
+        price: parseFloat(formData.price)
+      };
+
+      if (isEdit) {
+        await foodDrinkApi.update(id, payload);
+        alert('Cập nhật combo thành công!');
+      } else {
+        await foodDrinkApi.create(payload);
+        alert('Thêm combo mới thành công!');
+      }
+      navigate('/food-drinks');
+    } catch (error) {
+      console.error("Lỗi lưu combo:", error);
+      alert('Có lỗi xảy ra khi lưu combo bắp nước!');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <div style={{ color: 'var(--text-primary)', padding: '50px', textAlign: 'center' }}>Đang tải...</div>;
+
+  return (
+    <div className="movies-container">
+      <div className="page-header">
+        <h1 className="page-title">{isEdit ? 'Cập nhật Combo Bắp Nước' : 'Thêm Combo Mới'}</h1>
+        <p className="page-subtitle">Nhập thông tin chi tiết cho sản phẩm tại quầy</p>
+      </div>
+
+      <div className="glass-panel" style={{ width: '100%', padding: '30px' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          
+          <div style={{ display: 'flex', gap: '40px', flexWrap: 'wrap' }}>
+            
+            {/* Cột trái: Form nhập liệu */}
+            <div style={{ flex: '1 1 500px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ color: 'var(--text-secondary)', fontSize: '14px', fontWeight: '600' }}>Tên Combo *</label>
+                <div style={{ position: 'relative' }}>
+                  <Coffee size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                  <input 
+                    type="text" 
+                    name="name" 
+                    value={formData.name} 
+                    onChange={handleChange} 
+                    required 
+                    placeholder="Ví dụ: Combo Couple (2 Bắp + 2 Nước)"
+                    style={{ width: '100%', padding: '12px 12px 12px 40px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-main)', color: 'var(--text-primary)', fontSize: '15px' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ color: 'var(--text-secondary)', fontSize: '14px', fontWeight: '600' }}>Giá Bán (VNĐ) *</label>
+                <input 
+                  type="number" 
+                  name="price" 
+                  value={formData.price} 
+                  onChange={handleChange} 
+                  required 
+                  min="0"
+                  placeholder="Ví dụ: 150000"
+                  style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-main)', color: 'var(--text-primary)', fontSize: '15px' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ color: 'var(--text-secondary)', fontSize: '14px', fontWeight: '600' }}>URL Hình ảnh *</label>
+                <input 
+                  type="text" 
+                  name="imageUrl" 
+                  value={formData.imageUrl} 
+                  onChange={handleChange} 
+                  required 
+                  placeholder="Ví dụ: /images/combo.jpg hoặc http..."
+                  style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-main)', color: 'var(--text-primary)', fontSize: '15px' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ color: 'var(--text-secondary)', fontSize: '14px', fontWeight: '600' }}>Mô Tả Chi Tiết</label>
+                <textarea 
+                  name="description" 
+                  value={formData.description} 
+                  onChange={handleChange} 
+                  placeholder="Nhập mô tả về sản phẩm (Ví dụ: Bao gồm 1 bắp phô mai và 2 ly coca cỡ vừa)..."
+                  rows="4"
+                  style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-main)', color: 'var(--text-primary)', fontSize: '15px', resize: 'vertical' }}
+                />
+              </div>
+            </div>
+
+            {/* Cột phải: Xem trước hình ảnh */}
+            <div style={{ flex: '1 1 300px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label style={{ color: 'var(--text-secondary)', fontSize: '14px', fontWeight: '600' }}>Xem trước Hình ảnh</label>
+              <div style={{ 
+                width: '100%', 
+                height: '250px', 
+                borderRadius: '12px', 
+                border: '2px dashed var(--border-color)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                background: 'var(--bg-main)'
+              }}>
+                {formData.imageUrl ? (
+                  <img 
+                    src={formData.imageUrl} 
+                    alt="Preview" 
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'block';
+                    }}
+                    onLoad={(e) => {
+                      e.target.style.display = 'block';
+                      e.target.nextSibling.style.display = 'none';
+                    }}
+                  />
+                ) : null}
+                <div style={{ display: formData.imageUrl ? 'none' : 'block', color: formData.imageUrl ? '#ef4444' : '#9ca3af', textAlign: 'center', padding: '20px' }}>
+                  {formData.imageUrl ? 'Link ảnh bị lỗi hoặc không tồn tại' : 'Chưa có link ảnh'}
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-end', marginTop: '10px', paddingTop: '24px', borderTop: '1px solid var(--border-color)' }}>
+            <button 
+              type="button" 
+              onClick={() => navigate('/food-drinks')} 
+              className="btn-secondary"
+            >
+              <X size={18} /> Hủy bỏ
+            </button>
+            <button 
+              type="submit" 
+              disabled={saving} 
+              className="btn-primary"
+            >
+              <Save size={18} /> {saving ? 'Đang lưu...' : 'Lưu Thay Đổi'}
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default FoodDrinkForm;

@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+
+:root {
+  --cgv-red: #e71a0f;
+  --cgv-red-light: #ff4742;
+  --cgv-bg: #fdfcf0; /* Classic CGV beige */
+  --cgv-surface: #ffffff;
+  --cgv-text: #333333;
+  --cgv-text-muted: #666666;
+  --cgv-border: #cccccc;
+  --cgv-dark: #222222;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 8px 24px rgba(149, 157, 165, 0.15);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.1);
+  --font-family-base: 'Arial', 'Helvetica', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family-base);
+  background-color: var(--cgv-bg);
+  color: var(--cgv-text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+ul {
+  list-style: none;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+/* Carousel Wrapper */
+.bg-brick {
+  background-color: var(--cgv-bg);
+  padding: 20px 0;
+  border-bottom: 2px solid var(--cgv-dark);
+  border-top: 2px solid var(--cgv-dark);
+}
+
+/* Common Section Styles */
+.section-title {
+  text-align: center;
+  margin: 40px 0 30px;
+  position: relative;
+}
+
+.section-title h2 {
+  font-family: var(--font-family-base);
+  font-size: 30px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: inline-block;
+  background: var(--cgv-bg);
+  padding: 0 20px;
+  position: relative;
+  z-index: 1;
+  color: var(--cgv-dark);
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  border-top: 2px solid var(--cgv-dark);
+  z-index: 0;
+}

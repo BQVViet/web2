@@ -1,0 +1,284 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5; /* Lighter background */
+  background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=2025&auto=format&fit=crop'); /* Cinematic film background */
+  background-size: cover;
+  background-position: center;
+  font-family: 'Inter', sans-serif;
+  padding: 20px;
+  position: relative;
+}
+
+.auth-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6); /* Soften the background */
+  backdrop-filter: blur(5px);
+}
+
+.auth-box {
+  display: flex;
+  width: 100%;
+  max-width: 1100px; /* Made it wider */
+  height: 650px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+  z-index: 1;
+  position: relative;
+}
+
+/* LEFT BANNER SECTION */
+.auth-banner {
+  flex: 0 0 45%; /* Slightly wider left panel */
+  background-image: 
+    linear-gradient(135deg, rgba(200, 30, 30, 0.75) 0%, rgba(139, 0, 0, 0.85) 100%),
+    url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=2070&auto=format&fit=crop'); /* Movie theater seats */
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* Align tabs to the right edge */
+  border-radius: 20px 0 0 20px;
+}
+
+/* TOGGLE TABS */
+.auth-toggle-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transform: translateX(1px); /* Overlap perfectly */
+  z-index: 10;
+}
+
+.toggle-tab {
+  padding: 18px 35px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border-radius: 40px 0 0 40px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: right;
+  position: relative;
+}
+
+.toggle-tab::after {
+  content: '';
+  position: absolute;
+  right: -10px;
+  top: 0;
+  height: 100%;
+  width: 20px;
+  background: transparent;
+}
+
+.toggle-tab.active {
+  background: #ffffff;
+  color: #c81e1e; /* CGV Red */
+  font-weight: 700;
+  box-shadow: -10px 0 20px rgba(0,0,0,0.05);
+}
+
+.toggle-tab.active::after {
+  background: #ffffff;
+}
+
+/* RIGHT FORM SECTION */
+.auth-form-container {
+  flex: 1;
+  background: #ffffff;
+  padding: 50px 70px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-radius: 0 20px 20px 0;
+  overflow-y: auto;
+}
+
+.auth-icon-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 35px;
+}
+
+.icon-circle {
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff4b4b 0%, #c81e1e 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 20px rgba(200, 30, 30, 0.2);
+  margin-bottom: 15px;
+}
+
+.auth-icon-top h2 {
+  color: #c81e1e;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  margin: 0;
+}
+
+/* INPUT GROUPS */
+.auth-form-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  width: 100%;
+  max-width: 400px; /* Wider inputs */
+  margin: 0 auto;
+}
+
+.input-line-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-bottom: 1.5px solid #e5e7eb;
+  padding-bottom: 8px;
+  transition: all 0.3s;
+}
+
+.input-line-group:focus-within {
+  border-bottom: 1.5px solid #c81e1e;
+}
+
+.input-icon {
+  color: #9ca3af;
+  margin-right: 15px;
+  transition: color 0.3s;
+}
+
+.input-line-group:focus-within .input-icon {
+  color: #c81e1e;
+}
+
+.input-line-group input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  color: #1f2937;
+  padding: 6px 0;
+  outline: none;
+  font-weight: 500;
+}
+
+.input-line-group input::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+/* OPTIONS & BUTTONS */
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.register-options {
+  justify-content: flex-end;
+}
+
+.forgot-link {
+  color: #6b7280;
+  font-size: 13px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.forgot-link:hover {
+  color: #c81e1e;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #ff4b4b 0%, #c81e1e 100%);
+  color: white;
+  border: none;
+  padding: 14px 40px;
+  border-radius: 40px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(200, 30, 30, 0.3);
+  transition: all 0.3s ease;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(200, 30, 30, 0.4);
+}
+
+.submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.error-msg {
+  color: #b91c1c;
+  background: #fef2f2;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 25px;
+  border: 1px solid #fecaca;
+  font-weight: 500;
+}
+
+/* SOCIAL FOOTER */
+.social-login {
+  margin-top: auto;
+  padding-top: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.social-login span {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.social-icons {
+  display: flex;
+  gap: 20px;
+}
+
+.social-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.social-btn:hover {
+  opacity: 0.7;
+}
+
+.social-btn img {
+  width: 22px;
+  height: 22px;
+}
