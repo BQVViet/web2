@@ -30,6 +30,9 @@ public class InvoiceController {
     private final TicketRepository ticketRepository;
     private final InvoiceService invoiceService;
 
+    @org.springframework.beans.factory.annotation.Value("${app.frontend.url:http://localhost:5173}")
+    private String frontendUrl;
+
     @GetMapping
     public ResponseEntity<List<Map<String, Object>>> getAllInvoices() {
         List<Map<String, Object>> result = invoiceRepository.findAll().stream().map(invoice -> {
@@ -194,7 +197,7 @@ public class InvoiceController {
         }
         
         // Redirect to frontend with invoice ID and status
-        response.sendRedirect("http://localhost:5173/payment-result?invoiceId=" + invoiceIdStr + "&method=vnpay");
+        response.sendRedirect(frontendUrl + "/payment-result?invoiceId=" + invoiceIdStr + "&method=vnpay");
     }
 
     @GetMapping("/vnpay-ipn")
@@ -328,7 +331,7 @@ public class InvoiceController {
             System.err.println("Error processing Momo callback: " + e.getMessage());
         }
         
-        response.sendRedirect("http://localhost:5173/?momo_status=" + status + "&invoiceId=" + invoiceIdStr);
+        response.sendRedirect(frontendUrl + "/?momo_status=" + status + "&invoiceId=" + invoiceIdStr);
     }
 
     @DeleteMapping("/{id}")
