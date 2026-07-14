@@ -11,7 +11,7 @@ const ProtectedRoute = () => {
   
   try {
     const user = JSON.parse(userStr);
-    if (user.role !== 'ADMIN') {
+    if (user.role !== 'ADMIN' && user.role !== 'STAFF') {
       return <Navigate to="/login" replace />;
     }
   } catch (e) {

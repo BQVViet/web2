@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play } from 'lucide-react';
+import { Play, ChevronLeft, ChevronRight } from 'lucide-react';
 import '../styles/MovieSelection.css';
 import movieApi from '../api/movieApi';
 
@@ -15,7 +15,15 @@ const MovieSelection = ({ onBuyTicket, onPlayTrailer, onViewDetails, filter = 'A
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [genreFilter, setGenreFilter] = useState('ALL');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [homeSubTab, setHomeSubTab] = useState('DANG_CHIEU');
+  const itemsPerPage = 6;
   const sliderRef = useRef(null);
+
+  // Reset page to 1 when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter]);
 
   const genreTranslations = {
     'Action': 'Hành Động',
@@ -75,15 +83,15 @@ const MovieSelection = ({ onBuyTicket, onPlayTrailer, onViewDetails, filter = 'A
               try {
                 const url = new URL(m.trailerUrl);
                 yId = url.searchParams.get('v') || url.pathname.split('/').pop() || yId;
-              } catch (e) {}
+              } catch (e) { }
             } else if (m.title.toLowerCase().includes('mai')) {
               yId = 'EX6clvId19s';
             }
             return {
               ...m,
               image: m.posterUrl || '/images/movie_poster_1_1781694599129.png',
-              label: m.ageRating || '', 
-              youtubeId: yId 
+              label: m.ageRating || '',
+              youtubeId: yId
             };
           });
           setMovies(mappedMovies);
@@ -97,49 +105,57 @@ const MovieSelection = ({ onBuyTicket, onPlayTrailer, onViewDetails, filter = 'A
         setLoading(false);
       }
     };
-    
+
     fetchMovies();
   }, []);
 
   if (loading) {
-    return <div className="movie-selection container"><h2 style={{textAlign: 'center', padding: '50px'}}>Đang tải phim...</h2></div>;
+    return <div className="movie-selection container"><h2 style={{ textAlign: 'center', padding: '50px' }}>Đang tải phim...</h2></div>;
   }
 
   // Extract unique genres for the dropdown
   const allGenres = [...new Set(movies.flatMap(m => (m.genre || '').split(',').map(g => g.trim())).filter(Boolean))];
 
-  const displayMovies = movies.filter(m => {
+  const allFiltered = movies.filter(m => {
     const normalizedStatus = getNormalizedStatus(m.status);
-    const matchStatus = filter === 'ALL' || normalizedStatus === filter;
+    
+    let matchStatus;
+    if (filter === 'ALL') {
+      matchStatus = normalizedStatus === 'DANG_CHIEU' || normalizedStatus === 'SAP_CHIEU';
+    } else if (filter === 'ALL_GRID') {
+      matchStatus = normalizedStatus !== 'NGUNG_CHIEU';
+    } else {
+      matchStatus = normalizedStatus === filter;
+    }
+
     const matchSearch = m.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchGenre = genreFilter === 'ALL' || (m.genre && m.genre.includes(genreFilter));
     return matchStatus && matchSearch && matchGenre;
   });
 
+  const totalPages = Math.ceil(allFiltered.length / itemsPerPage);
+  const displayMovies = (filter === 'ALL')
+    ? allFiltered
+    : allFiltered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
   return (
     <div className="movie-selection container">
-      {filter !== 'ALL' && (
-        <div className="breadcrumb" style={{ padding: '20px 0', fontSize: '14px', color: '#666' }}>
-          <span style={{cursor: 'pointer'}} onClick={() => onFilterChange('ALL')}>🏠 Trang chủ</span> &gt; 
-          <span style={{cursor: 'pointer'}} onClick={() => onFilterChange('ALL')}> Phim</span> &gt; 
-          <span style={{color: '#222', fontWeight: 'bold'}}> {filter === 'DANG_CHIEU' ? 'Phim Đang Chiếu' : 'Phim Sắp Chiếu'}</span>
-        </div>
-      )}
-
       {filter === 'ALL' ? (
-        <div className="section-title">
-          <h2>LỰA CHỌN PHIM</h2>
+        <div className="home-movie-section-header" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '30px' }}>
+          <div className="section-title" style={{ marginBottom: '15px' }}>
+            <h2>LỰA CHỌN PHIM</h2>
+          </div>
         </div>
       ) : (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '2px solid #222', marginBottom: '30px' }}>
           <h1 style={{ fontSize: '36px', fontWeight: '300', margin: 0, paddingBottom: '15px', color: '#222' }}>
-            {filter === 'DANG_CHIEU' ? 'Phim Đang Chiếu' : 'Phim Sắp Chiếu'}
+            {filter === 'DANG_CHIEU' ? 'Phim Đang Chiếu' : filter === 'SAP_CHIEU' ? 'Phim Sắp Chiếu' : 'Tất Cả Phim'}
           </h1>
-          <div 
-            onClick={() => onFilterChange(filter === 'DANG_CHIEU' ? 'SAP_CHIEU' : 'DANG_CHIEU')}
-            style={{ fontSize: '18px', color: '#666', cursor: 'pointer', paddingBottom: '15px', textTransform: 'uppercase' }}
+          <div
+            onClick={() => onFilterChange(filter === 'SAP_CHIEU' ? 'DANG_CHIEU' : 'SAP_CHIEU')}
+            style={{ fontSize: '18px', color: '#666', cursor: 'pointer', paddingBottom: '15px', textTransform: 'uppercase', fontWeight: 'bold' }}
           >
-            {filter === 'DANG_CHIEU' ? 'PHIM SẮP CHIẾU' : 'PHIM ĐANG CHIẾU'}
+            {filter === 'SAP_CHIEU' ? 'PHIM ĐANG CHIẾU' : 'PHIM SẮP CHIẾU'}
           </div>
         </div>
       )}
@@ -147,16 +163,16 @@ const MovieSelection = ({ onBuyTicket, onPlayTrailer, onViewDetails, filter = 'A
       {/* Search & Filter Bar (Only on specific pages, not main page) */}
       {filter !== 'ALL' && (
         <div className="search-filter-bar" style={{ display: 'flex', gap: '15px', marginBottom: '30px', justifyContent: 'flex-end', alignItems: 'center' }}>
-          <input 
-            type="text" 
-            placeholder="Tìm kiếm tên phim..." 
+          <input
+            type="text"
+            placeholder="Tìm kiếm tên phim..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
             style={{ padding: '10px 15px', borderRadius: '25px', border: '1px solid #ccc', width: '250px', outline: 'none' }}
           />
-          <select 
-            value={genreFilter} 
-            onChange={(e) => setGenreFilter(e.target.value)}
+          <select
+            value={genreFilter}
+            onChange={(e) => { setGenreFilter(e.target.value); setCurrentPage(1); }}
             style={{ padding: '10px 15px', borderRadius: '25px', border: '1px solid #ccc', outline: 'none', cursor: 'pointer', backgroundColor: 'white' }}
           >
             <option value="ALL">Tất cả thể loại</option>
@@ -166,7 +182,7 @@ const MovieSelection = ({ onBuyTicket, onPlayTrailer, onViewDetails, filter = 'A
           </select>
         </div>
       )}
-      
+
       {filter === 'ALL' ? (
         <div className="slider-wrapper">
           {displayMovies.length > 4 && (
@@ -180,7 +196,7 @@ const MovieSelection = ({ onBuyTicket, onPlayTrailer, onViewDetails, filter = 'A
                     <span className={`age-label ${getAgeRatingClass(movie.label)}`}>{movie.label}</span>
                   )}
                   <img src={movie.image} alt={movie.title} />
-                  
+
                   <div className="play-button-overlay">
                     <div className="play-icon" onClick={() => onPlayTrailer(movie.youtubeId)}>
                       <Play fill="currentColor" />
@@ -213,7 +229,7 @@ const MovieSelection = ({ onBuyTicket, onPlayTrailer, onViewDetails, filter = 'A
                   <span className={`age-label ${getAgeRatingClass(movie.label)}`}>{movie.label}</span>
                 )}
                 <img src={movie.image} alt={movie.title} />
-                
+
                 <div className="play-button-overlay">
                   <div className="play-icon" onClick={() => onPlayTrailer(movie.youtubeId)}>
                     <Play fill="currentColor" />
@@ -232,6 +248,40 @@ const MovieSelection = ({ onBuyTicket, onPlayTrailer, onViewDetails, filter = 'A
               <h3 style={{ color: 'var(--cgv-text-muted)' }}>Không tìm thấy phim phù hợp.</h3>
             </div>
           )}
+        </div>
+      )}
+
+      {filter !== 'ALL' && totalPages > 1 && (
+        <div className="pagination-container">
+          <button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="pagination-btn"
+            title="Trang trước"
+          >
+            <ChevronLeft size={18} />
+          </button>
+
+          <div className="pagination-numbers">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`pagination-number-btn ${currentPage === page ? 'active' : ''}`}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="pagination-btn"
+            title="Trang sau"
+          >
+            <ChevronRight size={18} />
+          </button>
         </div>
       )}
     </div>

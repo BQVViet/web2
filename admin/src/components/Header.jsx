@@ -36,7 +36,7 @@ const Header = () => {
           <Bell size={16} />
           <span className="notification-dot"></span>
         </button>
-        <div className="profile-btn glass-panel" style={{ gap: '10px' }}>
+        <div className="profile-btn glass-panel" onClick={() => navigate('/profile')} style={{ gap: '10px', cursor: 'pointer' }}>
           <div className="avatar">{user ? user.fullName.charAt(0).toUpperCase() : 'A'}</div>
           <span className="profile-name">{user ? user.fullName : 'Quản trị viên'}</span>
         </div>

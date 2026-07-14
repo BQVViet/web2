@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { DollarSign, Film, Users, Ticket, TrendingUp } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { DollarSign, Film, Users, Ticket, Coffee, CalendarDays, Building2, PlaySquare } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import axios from 'axios';
+import axiosClient from '../api/axiosClient';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -22,8 +23,8 @@ const Dashboard = () => {
   const fetchDashboardStats = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/dashboard/overview');
-      setStats(response.data);
+      const response = await axiosClient.get('/dashboard/overview');
+      setStats(response);
       setLoading(false);
     } catch (err) {
       console.error('Error fetching dashboard stats:', err);
@@ -86,6 +87,30 @@ const Dashboard = () => {
           <div style={{ padding: '16px', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '12px', color: '#F59E0B' }}>
             <Ticket size={28} />
           </div>
+        </div>
+      </div>
+
+      <div className="glass-card" style={{ padding: '20px', marginBottom: '20px' }}>
+        <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '16px', color: 'var(--text-primary)' }}>Truy cập nhanh</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+          <Link to="/movies" style={{ textDecoration: 'none', padding: '14px', borderRadius: '12px', background: 'rgba(225,29,72,0.1)', color: 'inherit', border: '1px solid rgba(225,29,72,0.2)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600' }}><Film size={16} /> Quản lý phim</div>
+          </Link>
+          <Link to="/food-drinks" style={{ textDecoration: 'none', padding: '14px', borderRadius: '12px', background: 'rgba(16,185,129,0.1)', color: 'inherit', border: '1px solid rgba(16,185,129,0.2)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600' }}><Coffee size={16} /> Quản lý đồ ăn</div>
+          </Link>
+          <Link to="/showtimes" style={{ textDecoration: 'none', padding: '14px', borderRadius: '12px', background: 'rgba(59,130,246,0.1)', color: 'inherit', border: '1px solid rgba(59,130,246,0.2)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600' }}><CalendarDays size={16} /> Lịch chiếu</div>
+          </Link>
+          <Link to="/users" style={{ textDecoration: 'none', padding: '14px', borderRadius: '12px', background: 'rgba(245,158,11,0.1)', color: 'inherit', border: '1px solid rgba(245,158,11,0.2)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600' }}><Users size={16} /> Người dùng</div>
+          </Link>
+          <Link to="/invoices" style={{ textDecoration: 'none', padding: '14px', borderRadius: '12px', background: 'rgba(139,92,246,0.1)', color: 'inherit', border: '1px solid rgba(139,92,246,0.2)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600' }}><Ticket size={16} /> Đơn vé</div>
+          </Link>
+          <Link to="/banners" style={{ textDecoration: 'none', padding: '14px', borderRadius: '12px', background: 'rgba(236,72,153,0.1)', color: 'inherit', border: '1px solid rgba(236,72,153,0.2)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600' }}><PlaySquare size={16} /> Banner</div>
+          </Link>
         </div>
       </div>
 

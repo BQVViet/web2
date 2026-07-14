@@ -36,7 +36,6 @@
 
 .carousel-img {
   width: 100%;
-  max-width: 1400px; /* Slightly wider for a more cinematic feel */
   height: 100%;
   object-fit: cover;
   object-position: center;

@@ -15,6 +15,9 @@ const authApi = {
   },
   changePassword: (data) => {
     return axiosClient.put('/users/password', data);
+  },
+  forgotPassword: (email) => {
+    return axiosClient.post('/auth/forgot-password', { email });
   }
 };
 

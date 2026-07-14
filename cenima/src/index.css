@@ -27,6 +27,7 @@ body {
   color: var(--cgv-text);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 a {
@@ -46,12 +47,17 @@ ul {
 }
 
 /* Carousel Wrapper */
+/* Carousel Wrapper */
 .bg-brick {
-  background-color: var(--cgv-bg);
-  padding: 20px 0;
-  border-bottom: 2px solid var(--cgv-dark);
-  border-top: 2px solid var(--cgv-dark);
+  background-image: url('https://www.cgv.vn/skin/frontend/cgv/default/images/bg-cgv/bg_c_bricks.png');
+  background-repeat: repeat;
+  padding: 25px 0;
+  border-top: 15px solid #222;
+  border-bottom: 22px solid #54220b;
+  box-shadow: inset 0 0 100px rgba(0,0,0,0.5);
+  position: relative;
 }
+
 
 /* Common Section Styles */
 .section-title {
@@ -61,14 +67,14 @@ ul {
 }
 
 .section-title h2 {
-  font-family: var(--font-family-base);
-  font-size: 30px;
-  font-weight: 700;
+  font-family: 'Arial Black', 'Impact', sans-serif;
+  font-size: 32px;
+  font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 4px;
   display: inline-block;
   background: var(--cgv-bg);
-  padding: 0 20px;
+  padding: 0 24px;
   position: relative;
   z-index: 1;
   color: var(--cgv-dark);
@@ -80,6 +86,10 @@ ul {
   top: 50%;
   left: 0;
   right: 0;
-  border-top: 2px solid var(--cgv-dark);
+  height: 6px;
+  border-top: 1px solid var(--cgv-dark);
+  border-bottom: 1px solid var(--cgv-dark);
   z-index: 0;
+  transform: translateY(-50%);
 }
+

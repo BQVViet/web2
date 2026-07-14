@@ -10,8 +10,10 @@ const RoomList = () => {
   const [cinemas, setCinemas] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // Pagination & Search
+  // Pagination & Search & Filters
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterCinemaId, setFilterCinemaId] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   const navigate = useNavigate();
@@ -47,15 +49,27 @@ const RoomList = () => {
     }
   };
 
+  const handleToggleStatus = async (room) => {
+    const nextStatus = room.status === 'ACTIVE' ? 'MAINTENANCE' : 'ACTIVE';
+    try {
+      await roomApi.update(room.id, { ...room, status: nextStatus });
+      setRooms(prev => prev.map(r => r.id === room.id ? { ...r, status: nextStatus } : r));
+    } catch (error) {
+      alert("Có lỗi xảy ra khi đổi trạng thái phòng chiếu.");
+    }
+  };
+
   const getCinemaName = (id) => {
     const cinema = cinemas.find(c => c.id === id);
     return cinema ? cinema.name : `Rạp #${id}`;
   };
 
-  const filteredRooms = rooms.filter(r => 
-    (r.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    getCinemaName(r.cinemaId).toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredRooms = rooms.filter(r => {
+    const matchSearch = (r.name || '').toLowerCase().includes(searchTerm.toLowerCase());
+    const matchCinema = filterCinemaId === '' || String(r.cinemaId) === String(filterCinemaId);
+    const matchStatus = filterStatus === '' || r.status === filterStatus;
+    return matchSearch && matchCinema && matchStatus;
+  });
   
   const totalPages = Math.ceil(filteredRooms.length / itemsPerPage);
   const currentRooms = filteredRooms.slice(
@@ -65,15 +79,40 @@ const RoomList = () => {
 
   return (
     <div className="movies-page">
-      <div className="filter-bar glass-panel" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="filter-bar glass-panel" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
         <h2 style={{ margin: 0, color: 'inherit' }}>Danh sách Phòng chiếu</h2>
         
-        <div style={{ display: 'flex', gap: '15px' }}>
+        <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', alignItems: 'center' }}>
+          
+          {/* Lọc theo Rạp */}
+          <select 
+            value={filterCinemaId} 
+            onChange={(e) => { setFilterCinemaId(e.target.value); setCurrentPage(1); }}
+            style={{ padding: '10px 15px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-surface)', color: 'inherit', outline: 'none' }}
+          >
+            <option value="" style={{color: 'black'}}>Tất cả Rạp</option>
+            {cinemas.map(c => (
+              <option key={c.id} value={c.id} style={{color: 'black'}}>{c.name}</option>
+            ))}
+          </select>
+
+          {/* Lọc theo Trạng thái */}
+          <select 
+            value={filterStatus} 
+            onChange={(e) => { setFilterStatus(e.target.value); setCurrentPage(1); }}
+            style={{ padding: '10px 15px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-surface)', color: 'inherit', outline: 'none' }}
+          >
+            <option value="" style={{color: 'black'}}>Tất cả Trạng thái</option>
+            <option value="ACTIVE" style={{color: 'black'}}>Hoạt động</option>
+            <option value="MAINTENANCE" style={{color: 'black'}}>Bảo trì</option>
+          </select>
+
+          {/* Tìm kiếm */}
           <div style={{ position: 'relative' }}>
             <Search size={18} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
             <input 
               type="text" 
-              placeholder="Tìm theo tên phòng, rạp..." 
+              placeholder="Tìm theo tên phòng..." 
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -81,7 +120,7 @@ const RoomList = () => {
               }}
               style={{
                 padding: '10px 10px 10px 35px', borderRadius: '8px', border: '1px solid var(--border-color)',
-                background: 'var(--bg-surface)', color: 'inherit', outline: 'none', width: '250px'
+                background: 'var(--bg-surface)', color: 'inherit', outline: 'none', width: '220px'
               }}
             />
           </div>
@@ -120,13 +159,54 @@ const RoomList = () => {
                     <td style={{ padding: '15px' }}>{getCinemaName(room.cinemaId)}</td>
                     <td style={{ padding: '15px' }}>{room.capacity} ghế</td>
                     <td style={{ padding: '15px', textAlign: 'center' }}>
-                      <span style={{ 
-                        padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold',
-                        background: room.status === 'ACTIVE' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(156, 163, 175, 0.2)',
-                        color: room.status === 'ACTIVE' ? '#10b981' : '#9ca3af' 
-                      }}>
-                        {room.status === 'ACTIVE' ? 'Hoạt động' : 'Bảo trì'}
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                        <label style={{
+                          position: 'relative',
+                          display: 'inline-block',
+                          width: '44px',
+                          height: '22px',
+                          cursor: 'pointer'
+                        }}>
+                          <input 
+                            type="checkbox" 
+                            checked={room.status === 'ACTIVE'} 
+                            onChange={() => handleToggleStatus(room)}
+                            style={{ opacity: 0, width: 0, height: 0 }} 
+                          />
+                          <span style={{
+                            position: 'absolute',
+                            cursor: 'pointer',
+                            top: 0, left: 0, right: 0, bottom: 0,
+                            backgroundColor: room.status === 'ACTIVE' ? 'rgba(16, 185, 129, 0.8)' : 'rgba(156, 163, 175, 0.3)',
+                            transition: '0.3s',
+                            borderRadius: '22px',
+                            border: '1px solid var(--border-color)'
+                          }}>
+                            <span style={{
+                              position: 'absolute',
+                              content: '""',
+                              height: '16px',
+                              width: '16px',
+                              left: '2px',
+                              bottom: '2px',
+                              backgroundColor: '#ffffff',
+                              transition: '0.3s',
+                              borderRadius: '50%',
+                              transform: room.status === 'ACTIVE' ? 'translateX(22px)' : 'translateX(0)',
+                              boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                            }} />
+                          </span>
+                        </label>
+                        <span style={{ 
+                          fontSize: '13px', 
+                          fontWeight: '600', 
+                          color: room.status === 'ACTIVE' ? '#10b981' : 'var(--text-muted)',
+                          minWidth: '65px',
+                          textAlign: 'left'
+                        }}>
+                          {room.status === 'ACTIVE' ? 'Hoạt động' : 'Bảo trì'}
+                        </span>
+                      </div>
                     </td>
                     <td style={{ padding: '15px', textAlign: 'right' }}>
                       <button 
@@ -155,13 +235,13 @@ const RoomList = () => {
             </table>
           </div>
           
-          {totalPages > 1 && (
+          {totalPages > 0 && (
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', gap: '10px' }}>
               <button 
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
                 style={{ padding: '8px 12px', borderRadius: '8px', background: currentPage === 1 ? 'rgba(255,255,255,0.1)' : 'var(--primary-color)', color: 'inherit', border: 'none', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center' }}
               >
-                <ChevronLeft size={16} /> Prev
+                <ChevronLeft size={16} />
               </button>
               
               <div style={{ display: 'flex', alignItems: 'center', color: 'inherit', gap: '10px' }}>
@@ -176,7 +256,7 @@ const RoomList = () => {
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
                 style={{ padding: '8px 12px', borderRadius: '8px', background: currentPage === totalPages ? 'rgba(255,255,255,0.1)' : 'var(--primary-color)', color: 'inherit', border: 'none', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center' }}
               >
-                Next <ChevronRight size={16} />
+                <ChevronRight size={16} />
               </button>
             </div>
           )}

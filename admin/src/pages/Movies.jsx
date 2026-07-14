@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import movieApi from '../api/movieApi';
 import '../styles/Movies.css';
+import MovieDetailsModal from '../components/MovieDetailsModal';
 
 const Movies = () => {
   const [movies, setMovies] = useState([]);
@@ -14,7 +15,8 @@ const Movies = () => {
   const [filterGenre, setFilterGenre] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  const itemsPerPage = 6;
+  const [detailMovie, setDetailMovie] = useState(null);
 
   const GENRES = [
     'Hành động', 'Hài hước', 'Tình cảm', 'Kinh dị',
@@ -24,6 +26,19 @@ const Movies = () => {
   useEffect(() => {
     fetchMovies();
   }, []);
+
+  const resolvePosterSrc = (movie) => {
+    const placeholder = `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600"><rect fill="#111827" width="100%" height="100%"/><text x="50%" y="50%" font-size="20" fill="#6B7280" dominant-baseline="middle" text-anchor="middle">No Image</text></svg>')}`;
+    if (!movie || !movie.posterUrl) return { src: placeholder, isPlaceholder: true };
+    const trimmed = movie.posterUrl.trim();
+    let src;
+    if (!/^https?:\/\//i.test(trimmed) && !/^\//.test(trimmed)) {
+      src = `${window.location.origin}/${trimmed.replace(/^\/+/, '')}`;
+    } else {
+      src = trimmed;
+    }
+    return { src, isPlaceholder: false };
+  };
 
   const fetchMovies = async () => {
     try {
@@ -62,11 +77,23 @@ const Movies = () => {
   };
 
   const filteredMovies = movies.filter(m => {
-    const matchSearch = m.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        (m.director || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        (m.genre || '').toLowerCase().includes(searchTerm.toLowerCase());
-    const matchGenre = filterGenre === '' || m.genre === filterGenre;
-    const matchStatus = filterStatus === '' || m.status === filterStatus;
+    const q = searchTerm.toLowerCase();
+    const matchSearch = (m.title || '').toLowerCase().includes(q) ||
+                        (m.director || '').toLowerCase().includes(q) ||
+                        (m.genre || '').toLowerCase().includes(q);
+
+    const normalizeStatus = (s) => {
+      if (!s) return '';
+      const x = s.toString().toUpperCase();
+      if (x.includes('DANG') || x.includes('ĐANG') || x.includes('DANG_CHIEU') || x.includes('DANG-CHIEU')) return 'DANG_CHIEU';
+      if (x.includes('SAP') || x.includes('SẮP') || x.includes('SAP_CHIEU') || x.includes('SAP-CHIEU')) return 'SAP_CHIEU';
+      if (x.includes('NGUNG') || x.includes('NGỪNG') || x.includes('NGUNG_CHIEU') || x.includes('NGUNG-CHIEU')) return 'NGUNG_CHIEU';
+      return x.replace(/[^A-Z0-9]/g, '');
+    };
+
+    const matchGenre = filterGenre === '' || (m.genre && m.genre.toLowerCase().includes(filterGenre.toLowerCase()));
+    const matchStatus = filterStatus === '' || (normalizeStatus(m.status) === normalizeStatus(filterStatus));
+
     return matchSearch && matchGenre && matchStatus;
   });
   
@@ -145,6 +172,8 @@ const Movies = () => {
             {currentMovies.map((movie) => (
               <div key={movie.id} className="movie-card glass-panel" style={{ padding: 0 }}>
                 <div className="card-image-container">
+                  {/* clicking the image opens details */}
+                  <div onClick={() => navigate(`/movies/details/${movie.id}`)} style={{ position: 'absolute', inset: 0, zIndex: 5, cursor: 'pointer' }} />
                   <div className="card-badges">
                     <div className="left-badges">
                       <span className="quality-badge new">HD</span>
@@ -155,24 +184,41 @@ const Movies = () => {
                       )}
                     </div>
                   </div>
-                  <img src={movie.posterUrl} alt={movie.title} className="card-image" />
+                  {(() => {
+                    const res = resolvePosterSrc(movie);
+                    const placeholder = `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600"><rect fill="#111827" width="100%" height="100%"/><text x="50%" y="50%" font-size="20" fill="#6B7280" dominant-baseline="middle" text-anchor="middle">No Image</text></svg>')}`;
+                    return (
+                      <>
+                        <img
+                          src={res.src}
+                          alt={movie.title}
+                          className="card-image"
+                          onError={(e) => { console.warn('Poster failed to load:', movie.id, res.src); if (e && e.target) e.target.src = placeholder; }}
+                        />
+                        <div className="poster-url" title={res.src}>
+                          {res.isPlaceholder ? 'No image' : res.src.replace(window.location.origin, '')}
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
-                <div className="card-info">
+                    <div className="card-info">
                   <h3 className="movie-title">{movie.title}</h3>
+                  {movie.director && <div className="movie-director">Đạo diễn: {movie.director}</div>}
                   <div className="movie-meta">
-                    <span>{movie.durationMinutes} phút</span>
-                    {movie.genre && <span className="genre-tag">{movie.genre}</span>}
+                    <span>{movie.durationMinutes ? `${movie.durationMinutes} phút` : '—'}</span>
+                    {movie.genre ? <span className="genre-tag">{movie.genre}</span> : <span className="genre-tag">Không rõ</span>}
                   </div>
                   <div className="card-actions-inline">
                     <button 
                       className="action-btn-small edit"
-                      onClick={() => handleEditMovie(movie)}
+                      onClick={(e) => { e.stopPropagation(); handleEditMovie(movie); }}
                     >
                       <Edit2 size={14} /> Sửa
                     </button>
                     <button 
                       className="action-btn-small delete"
-                      onClick={() => handleDeleteMovie(movie.id)}
+                      onClick={(e) => { e.stopPropagation(); handleDeleteMovie(movie.id); }}
                     >
                       <Trash2 size={14} /> Xóa
                     </button>
@@ -180,20 +226,20 @@ const Movies = () => {
                 </div>
               </div>
             ))}
-            {currentMovies.length === 0 && (
+              {currentMovies.length === 0 && (
               <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '50px', color: 'var(--text-muted)' }}>
                 Không tìm thấy phim nào.
               </div>
             )}
           </div>
           
-          {totalPages > 1 && (
+          {totalPages > 0 && (
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', gap: '10px' }}>
               <button 
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
                 style={{ padding: '8px 12px', borderRadius: '8px', background: currentPage === 1 ? 'rgba(255,255,255,0.1)' : 'var(--primary-color)', color: 'inherit', border: 'none', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center' }}
               >
-                <ChevronLeft size={16} /> Prev
+                <ChevronLeft size={16} />
               </button>
               
               <div style={{ display: 'flex', alignItems: 'center', color: 'inherit', gap: '10px' }}>
@@ -208,7 +254,7 @@ const Movies = () => {
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
                 style={{ padding: '8px 12px', borderRadius: '8px', background: currentPage === totalPages ? 'rgba(255,255,255,0.1)' : 'var(--primary-color)', color: 'inherit', border: 'none', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center' }}
               >
-                Next <ChevronRight size={16} />
+                <ChevronRight size={16} />
               </button>
             </div>
           )}

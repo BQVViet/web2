@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, Search, ChevronLeft, ChevronRight, Eye, Edit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import bannerApi from '../api/bannerApi';
 import '../styles/Movies.css';
@@ -27,6 +27,16 @@ const BannerList = () => {
       console.error("Lỗi khi tải danh sách banner:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleToggleActive = async (banner) => {
+    const nextActive = !banner.isActive;
+    try {
+      const updated = await bannerApi.update(banner.id, { ...banner, isActive: nextActive });
+      setBanners(prev => prev.map(b => (b.id === banner.id ? { ...b, ...updated } : b)));
+    } catch (error) {
+      alert('Có lỗi xảy ra khi đổi trạng thái hiển thị banner.');
     }
   };
 
@@ -110,31 +120,81 @@ const BannerList = () => {
                   <tr key={banner.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                     <td style={{ padding: '15px' }}>#{banner.id}</td>
                     <td style={{ padding: '15px' }}>
-                      <img src={banner.imageUrl} alt="Banner" style={{ width: '120px', height: '60px', objectFit: 'cover', borderRadius: '8px' }} />
+                      <img src={banner.imageUrl} alt="Banner" style={{ width: '120px', height: '60px', objectFit: 'contain', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', border: '1px solid var(--border-color)' }} />
                     </td>
                     <td style={{ padding: '15px', fontWeight: 'bold' }}>{banner.title || 'Không có'}</td>
                     <td style={{ padding: '15px', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {banner.targetUrl || 'Trống'}
                     </td>
                     <td style={{ padding: '15px', textAlign: 'center' }}>
-                      <span style={{ 
-                        padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold',
-                        background: banner.isActive ? 'rgba(16, 185, 129, 0.2)' : 'rgba(156, 163, 175, 0.2)',
-                        color: banner.isActive ? '#10b981' : '#9ca3af' 
-                      }}>
-                        {banner.isActive ? 'Hiển thị' : 'Đã ẩn'}
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                        <label style={{
+                          position: 'relative',
+                          display: 'inline-block',
+                          width: '44px',
+                          height: '22px',
+                          cursor: 'pointer'
+                        }}>
+                          <input 
+                            type="checkbox" 
+                            checked={banner.isActive !== false} 
+                            onChange={() => handleToggleActive(banner)}
+                            style={{ opacity: 0, width: 0, height: 0 }} 
+                          />
+                          <span style={{
+                            position: 'absolute',
+                            cursor: 'pointer',
+                            top: 0, left: 0, right: 0, bottom: 0,
+                            backgroundColor: banner.isActive !== false ? 'rgba(16, 185, 129, 0.8)' : 'rgba(156, 163, 175, 0.3)',
+                            transition: '0.3s',
+                            borderRadius: '22px',
+                            border: '1px solid var(--border-color)'
+                          }}>
+                            <span style={{
+                              position: 'absolute',
+                              content: '""',
+                              height: '16px',
+                              width: '16px',
+                              left: '2px',
+                              bottom: '2px',
+                              backgroundColor: '#ffffff',
+                              transition: '0.3s',
+                              borderRadius: '50%',
+                              transform: banner.isActive !== false ? 'translateX(22px)' : 'translateX(0)',
+                              boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                            }} />
+                          </span>
+                        </label>
+                        <span style={{ 
+                          fontSize: '13px', 
+                          fontWeight: '600', 
+                          color: banner.isActive !== false ? '#10b981' : 'var(--text-muted)',
+                          minWidth: '35px',
+                          textAlign: 'left'
+                        }}>
+                          {banner.isActive !== false ? 'Hiện' : 'Ẩn'}
+                        </span>
+                      </div>
                     </td>
                     <td style={{ padding: '15px', textAlign: 'right' }}>
                       <button 
-                        onClick={() => navigate(`/banners/edit/${banner.id}`)}
+                        onClick={() => navigate(`/banners/details/${banner.id}`)}
                         style={{ background: 'transparent', border: 'none', color: '#60a5fa', cursor: 'pointer', padding: '5px', marginRight: '10px' }}
+                        title="Xem chi tiết"
                       >
-                        <Edit2 size={18} />
+                        <Eye size={18} />
+                      </button>
+                      <button 
+                        onClick={() => navigate(`/banners/edit/${banner.id}`)}
+                        style={{ background: 'transparent', border: 'none', color: '#fbbf24', cursor: 'pointer', padding: '5px', marginRight: '10px' }}
+                        title="Chỉnh sửa banner"
+                      >
+                        <Edit size={18} />
                       </button>
                       <button 
                         onClick={() => handleDelete(banner.id)}
                         style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '5px' }}
+                        title="Xóa banner"
                       >
                         <Trash2 size={18} />
                       </button>
@@ -158,7 +218,7 @@ const BannerList = () => {
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
                 style={{ padding: '8px 12px', borderRadius: '8px', background: currentPage === 1 ? 'rgba(255,255,255,0.1)' : 'var(--primary-color)', color: 'inherit', border: 'none', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center' }}
               >
-                <ChevronLeft size={16} /> Prev
+                <ChevronLeft size={16} />
               </button>
               
               <div style={{ display: 'flex', alignItems: 'center', color: 'inherit', gap: '10px' }}>
@@ -173,7 +233,7 @@ const BannerList = () => {
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
                 style={{ padding: '8px 12px', borderRadius: '8px', background: currentPage === totalPages ? 'rgba(255,255,255,0.1)' : 'var(--primary-color)', color: 'inherit', border: 'none', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center' }}
               >
-                Next <ChevronRight size={16} />
+                <ChevronRight size={16} />
               </button>
             </div>
           )}

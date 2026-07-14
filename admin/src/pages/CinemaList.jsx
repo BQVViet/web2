@@ -1,12 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Edit, Trash2, Search, MapPin, Phone } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, MapPin, Phone, ChevronLeft, ChevronRight } from 'lucide-react';
 import cinemaApi from '../api/cinemaApi';
 
 const CinemaList = () => {
   const [cinemas, setCinemas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [cityFilter, setCityFilter] = useState('ALL');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  const getCity = (address) => {
+    const addr = (address || '').toLowerCase();
+    if (addr.includes('hồ chí minh') || addr.includes('tp.hcm') || addr.includes('hcm') || addr.includes('sài gòn')) return 'HCM';
+    if (addr.includes('hà nội') || addr.includes('hn')) return 'HN';
+    if (addr.includes('đà nẵng') || addr.includes('dn')) return 'DN';
+    if (addr.includes('cần thơ') || addr.includes('ct')) return 'CT';
+    return 'OTHER';
+  };
 
   useEffect(() => {
     fetchCinemas();
@@ -29,40 +41,75 @@ const CinemaList = () => {
       try {
         await cinemaApi.delete(id);
         setCinemas(cinemas.filter(c => c.id !== id));
+        
+        const newFiltered = cinemas.filter(c => c.id !== id && ((c.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (c.address || '').toLowerCase().includes(searchTerm.toLowerCase())));
+        if (newFiltered.length <= (currentPage - 1) * itemsPerPage && currentPage > 1) {
+          setCurrentPage(currentPage - 1);
+        }
       } catch (error) {
         alert("Có lỗi xảy ra khi xóa rạp phim.");
       }
     }
   };
 
-  const filteredCinemas = cinemas.filter(c => 
-    (c.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
-    (c.address || '').toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredCinemas = cinemas.filter(c => {
+    const matchesSearch = 
+      (c.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+      (c.address || '').toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesCity = cityFilter === 'ALL' || getCity(c.address) === cityFilter;
+    
+    return matchesSearch && matchesCity;
+  });
+
+  const totalPages = Math.ceil(filteredCinemas.length / itemsPerPage);
+  const currentCinemas = filteredCinemas.slice(
+    (currentPage - 1) * itemsPerPage, 
+    currentPage * itemsPerPage
   );
 
   return (
     <div className="movies-container">
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h1 className="page-title">Quản lý Rạp Phim</h1>
-          <p className="page-subtitle">Danh sách các cụm rạp trên toàn quốc</p>
-        </div>
         <Link to="/cinemas/create" className="btn-primary">
           <Plus size={18} /> Thêm Rạp Mới
         </Link>
       </div>
 
-      <div className="filters-bar glass-panel">
-        <div className="search-box">
+      <div className="filters-bar glass-panel" style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+        <div className="search-box" style={{ flex: 1 }}>
           <Search size={20} className="search-icon" />
           <input 
             type="text" 
             placeholder="Tìm kiếm theo tên rạp hoặc địa chỉ..." 
             className="search-input"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
           />
         </div>
+
+        <select
+          value={cityFilter}
+          onChange={(e) => { setCityFilter(e.target.value); setCurrentPage(1); }}
+          style={{
+            padding: '10px 16px',
+            borderRadius: '8px',
+            border: '1px solid var(--border-color)',
+            background: 'var(--bg-main)',
+            color: 'var(--text-primary)',
+            cursor: 'pointer',
+            outline: 'none',
+            fontSize: '14px',
+            minWidth: '180px'
+          }}
+        >
+          <option value="ALL">Tất cả thành phố</option>
+          <option value="HCM">TP. Hồ Chí Minh</option>
+          <option value="HN">Hà Nội</option>
+          <option value="DN">Đà Nẵng</option>
+          <option value="CT">Cần Thơ</option>
+          <option value="OTHER">Thành phố khác</option>
+        </select>
       </div>
 
       <div className="table-container glass-panel">
@@ -83,14 +130,14 @@ const CinemaList = () => {
                   Đang tải dữ liệu...
                 </td>
               </tr>
-            ) : filteredCinemas.length === 0 ? (
+            ) : currentCinemas.length === 0 ? (
               <tr>
                 <td colSpan="5" style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
                   Không tìm thấy rạp phim nào
                 </td>
               </tr>
             ) : (
-              filteredCinemas.map((cinema) => (
+              currentCinemas.map((cinema) => (
                 <tr key={cinema.id}>
                   <td style={{ fontWeight: '600', color: 'var(--text-muted)' }}>#{cinema.id}</td>
                   <td style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>{cinema.name}</td>
@@ -126,6 +173,32 @@ const CinemaList = () => {
           </tbody>
         </table>
       </div>
+
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', gap: '10px' }}>
+          <button 
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
+            style={{ padding: '8px 12px', borderRadius: '8px', background: currentPage === 1 ? 'rgba(255,255,255,0.1)' : 'var(--primary-color)', color: 'inherit', border: 'none', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center' }}
+          >
+            <ChevronLeft size={16} />
+          </button>
+          
+          <div style={{ display: 'flex', alignItems: 'center', color: 'inherit', gap: '10px' }}>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              <button key={page} onClick={() => setCurrentPage(page)} style={{ padding: '8px 12px', borderRadius: '8px', background: currentPage === page ? '#ffffff' : 'rgba(255,255,255,0.1)', color: currentPage === page ? '#000000' : 'white', border: 'none', cursor: 'pointer', fontWeight: currentPage === page ? 'bold' : 'normal' }}>
+                {page}
+              </button>
+            ))}
+          </div>
+
+          <button 
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
+            style={{ padding: '8px 12px', borderRadius: '8px', background: currentPage === totalPages ? 'rgba(255,255,255,0.1)' : 'var(--primary-color)', color: 'inherit', border: 'none', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center' }}
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      )}
     </div>
   );
 };

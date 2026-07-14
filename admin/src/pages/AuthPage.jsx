@@ -45,7 +45,7 @@ const AuthPage = () => {
     
     try {
       const response = await authApi.login({ email: loginEmail, password: loginPassword });
-      if (response.role !== 'ADMIN') {
+      if (response.role !== 'ADMIN' && response.role !== 'STAFF') {
         setError('Bạn không có quyền truy cập trang quản trị!');
         setLoading(false);
         return;

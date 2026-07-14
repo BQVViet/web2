@@ -27,16 +27,22 @@ const BannerForm = () => {
   const fetchBanner = async () => {
     try {
       setLoading(true);
-      const data = await bannerApi.getAll();
-      const banner = data.find(b => b.id.toString() === id);
+      const banner = await bannerApi.getById(id);
       if (banner) {
-        setFormData(banner);
+        setFormData({
+          imageUrl: banner.imageUrl || '',
+          targetUrl: banner.targetUrl || '',
+          title: banner.title || '',
+          isActive: banner.isActive !== false
+        });
       } else {
         alert("Không tìm thấy banner!");
         navigate('/banners');
       }
     } catch (error) {
       console.error("Lỗi khi tải thông tin banner:", error);
+      alert('Không thể tải thông tin banner.');
+      navigate('/banners');
     } finally {
       setLoading(false);
     }

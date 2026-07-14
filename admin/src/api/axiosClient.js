@@ -25,6 +25,11 @@ axiosClient.interceptors.response.use(
     return response.data;
   },
   function (error) {
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('adminUser');
+      window.location.href = '/login';
+    }
     return Promise.reject(error);
   }
 );
